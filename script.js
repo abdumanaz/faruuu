@@ -62,10 +62,14 @@ footerEl.textContent = CONFIG.footer;
 
 // Preload images to avoid flicker
 (function preloadImages() {
-  for (const s of STEPS) {
-    if (!s.image) continue;
+  const sources = [
+    ...STEPS.map((s) => s.image).filter(Boolean),
+    "yay.gif", // 👈 preload final GIF
+  ];
+
+  for (const src of sources) {
     const img = new Image();
-    img.src = s.image;
+    img.src = src;
   }
 })();
 
