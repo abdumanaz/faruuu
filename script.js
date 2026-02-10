@@ -1,5 +1,5 @@
 const CONFIG = {
-  name: "Faruuuuu",
+  name: "Faruuu",
   footer: "Made with ❤️ (and mild stubbornness)",
 };
 
@@ -25,7 +25,7 @@ const STEPS = [
     imgScale: 1.4,
   },
   {
-    comment: "Eee pennine kond!!!!",
+    comment: `Eee <s>pennine</s> saadhanathine kond!!!`,
     caption: "Still saying no? 🙃 Vidilla njan 😂",
     noLevel: 3,
     yesPulse: false,
@@ -36,7 +36,7 @@ const STEPS = [
   },
   {
     comment: "Heheheeee!!! Kali ennod venda 😌",
-    caption: "Go on… you know you want to 😌",
+    caption: "Take your time… I'm right here 🤍",
     noLevel: 1,
     yesPulse: false,
     yesScaleLevel: 3,
@@ -77,11 +77,11 @@ function setYesScale(level) {
 function render() {
   const s = STEPS[step];
 
-  commentEl.textContent = s.comment || "";
+  commentEl.innerHTML = s.comment || "&nbsp;";
   if (step === 2) {
     titleEl.textContent = `${CONFIG.name} !!!!! Be my valentine !!!!`;
   } else if (step == 3) {
-    titleEl.textContent = `Dear ${CONFIG.name},You've won a special prize !!!!`;
+    titleEl.textContent = `Dear ${CONFIG.name},You've won a special prize !!!! Click Yes to claim it !!!!`;
   } else {
     titleEl.textContent = `Dear ${CONFIG.name}, will you be my valentine?`;
   }
@@ -154,13 +154,24 @@ function nextStep() {
   render();
 }
 
+let finished = false;
+
 function showYay() {
+  if (finished) return;
+  finished = true;
   document.querySelector(".card").innerHTML = `
-    <div style="text-align:center; padding: 8px 0;">
-      <div style="font-size:70px; margin-bottom: 6px;">💖</div>
-      <div style="font-size:44px; font-weight:950; letter-spacing:-0.02em;">Yayyyyy!</div>
+    <div style="text-align:center; padding: 12px 0;">
+      <img
+        src="yay.gif"
+        alt="Yay!"
+        style="width:220px; max-width:80%; margin-bottom: 12px;"
+      />
+      <div style="font-size:44px; font-weight:950; letter-spacing:-0.02em;">
+        Yaayyy !!!!
+      </div>
       <div style="margin-top: 10px; font-size:18px; font-weight:800; color: rgba(17,24,39,.65);">
-        See you on Valentine’s ✨
+        Happy Valentine’s Day My Dear !! ✨💖<br>
+        See you soon !!!
       </div>
     </div>
   `;
