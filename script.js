@@ -5,29 +5,46 @@ const CONFIG = {
 
 const STEPS = [
   {
-    title: (n) => `Dear ${n}, will you be my valentine?`,
-    caption: `Since you take 2-3 business days to respond 😌`,
+    comment: "",
+    caption: "Since you take 2-3 business days to respond 😌",
     noLevel: 0,
-    yesPulse: true,
+    yesBounce: true, // 👈 ADD THIS
+    yesScaleLevel: 0,
+    image: "cat-1.png",
   },
+
   {
-    comment: `Dhushttaa!!! Let’s do this one more time!!!`,
-    caption: `I think you misclicked 😏`,
-    noLevel: 1,
-    yesPulse: false,
-  },
-  {
-    title: () => `Eee pennine konda!!!!`,
-    caption: `Still saying no? Bold move 🙃`,
+    comment: "Dhushttaa!!! Let’s do this one more time!!!",
+    caption: "I think you misclicked 😏",
     noLevel: 2,
     yesPulse: false,
+    yesScaleLevel: 2,
+    image: "cat-2.png",
+    imageAlt: "Slightly annoyed cat",
+    shakeNo: true,
+    imgScale: 1.4,
   },
   {
-    title: () => `Heheheeee!!! Kali ennod venda 😌`,
-    caption: `Okay, okay… enough games 😇`,
+    comment: "Eee pennine kond!!!!",
+    caption: "Still saying no? 🙃 Vidilla njan 😂",
     noLevel: 3,
     yesPulse: false,
+    yesScaleLevel: 2,
+    image: "cat-3.png",
+    imageAlt: "Exhale / exhausted cat",
+    imgScale: 1.4,
+  },
+  {
+    comment: "Heheheeee!!! Kali ennod venda 😌",
+    caption: "Go on… you know you want to 😌",
+    noLevel: 1,
+    yesPulse: false,
+    yesScaleLevel: 3,
     finalYes: true,
+    image: "cat-4.png",
+    imageAlt: "Happy relieved cat",
+    finalYes: true,
+    imgScale: 1.4,
   },
 ];
 
@@ -43,26 +60,93 @@ const commentEl = document.getElementById("comment");
 
 footerEl.textContent = CONFIG.footer;
 
+// Preload images to avoid flicker
+(function preloadImages() {
+  for (const s of STEPS) {
+    if (!s.image) continue;
+    const img = new Image();
+    img.src = s.image;
+  }
+})();
+
+function setYesScale(level) {
+  yesBtn.classList.remove("yes-0", "yes-1", "yes-2", "yes-3");
+  yesBtn.classList.add(`yes-${Math.min(Math.max(level, 0), 3)}`);
+}
+
 function render() {
   const s = STEPS[step];
 
   commentEl.textContent = s.comment || "";
-  titleEl.textContent = `Dear ${CONFIG.name}, will you be my valentine?`;
-  captionEl.textContent = s.caption ?? captionEl.textContent;
+  if (step === 2) {
+    titleEl.textContent = `${CONFIG.name} !!!!! Be my valentine !!!!`;
+  } else if (step == 3) {
+    titleEl.textContent = `Dear ${CONFIG.name},You've won a special prize !!!!`;
+  } else {
+    titleEl.textContent = `Dear ${CONFIG.name}, will you be my valentine?`;
+  }
 
+  captionEl.textContent = s.caption || "";
+
+  // Yes emphasis
   yesBtn.classList.toggle("pulse", !!s.yesPulse);
+  setYesScale(s.yesScaleLevel ?? 0);
 
+  // No shrink/fade
   noBtn.classList.remove("level-0", "level-1", "level-2", "level-3");
-  noBtn.classList.add(`level-${s.noLevel}`);
+  noBtn.classList.add(`level-${Math.min(Math.max(s.noLevel ?? 0, 0), 3)}`);
 
+  // Final step: Yes / Yes
   noBtn.textContent = s.finalYes ? "Yes" : "No";
+
+  if (s.finalYes) {
+    // Make both buttons look the same
+    yesBtn.classList.remove("pulse", "glow", "pulseglow");
+    setYesScale(0);
+
+    noBtn.classList.remove("no", "level-0", "level-1", "level-2", "level-3");
+    noBtn.classList.add("yes");
+  } else {
+    // Normal state
+    noBtn.classList.remove("yes");
+    noBtn.classList.add("no");
+  }
+
+  const imgScale = s.imgScale ?? 1;
+
   iconWrap.innerHTML = `
   <img
-    src="cat.png"
-    alt="Smiling cat"
+    src="${s.image}"
+    alt="${s.imageAlt || "Cat"}"
     class="cat-img"
+    style="transform: scale(${imgScale});"
+    loading="eager"
+    decoding="async"
   />
 `;
+  // only step 0
+  yesBtn.classList.add("pulseglow");
+
+  // YES emphasis
+  if (s.finalYes) {
+    // Reset all special styling when it's Yes / Yes
+    yesBtn.classList.remove(
+      "pulse",
+      "pulseglow",
+      "glow",
+      "bounce",
+      "yes-0",
+      "yes-1",
+      "yes-2",
+      "yes-3",
+    );
+  } else {
+    // Normal behaviour
+    yesBtn.classList.toggle("pulse", step === 0);
+    setYesScale(s.yesScaleLevel ?? 0);
+    noBtn.classList.toggle("yes", s.finalYes);
+    noBtn.classList.toggle("no", !s.finalYes);
+  }
 }
 
 function nextStep() {
@@ -72,53 +156,21 @@ function nextStep() {
 
 function showYay() {
   document.querySelector(".card").innerHTML = `
-    <div style="text-align:center">
-      <div style="font-size:54px">💖</div>
-      <h2 style="margin:10px 0;font-size:44px">Yayyyy!</h2>
-      <p style="font-weight:700">See you on Valentine’s ✨</p>
+    <div style="text-align:center; padding: 8px 0;">
+      <div style="font-size:70px; margin-bottom: 6px;">💖</div>
+      <div style="font-size:44px; font-weight:950; letter-spacing:-0.02em;">Yayyyyy!</div>
+      <div style="margin-top: 10px; font-size:18px; font-weight:800; color: rgba(17,24,39,.65);">
+        See you on Valentine’s ✨
+      </div>
     </div>
   `;
+  popConfetti();
 }
 
 yesBtn.addEventListener("click", showYay);
 
-noBtn.addEventListener("click", () => {
-  if (STEPS[step].finalYes) {
-    showYay();
-    return;
-  }
-  noBtn.classList.remove("wiggle");
-  void noBtn.offsetWidth;
-  noBtn.classList.add("wiggle");
-  nextStep();
-});
-
 // Initial render
 render();
-
-function catHeartSvg() {
-  return `
-  <svg viewBox="0 0 120 120" width="84" height="84">
-    <defs>
-      <radialGradient id="g2" cx="50%" cy="55%" r="60%">
-        <stop offset="0%" stop-color="#F8C9A0"/>
-        <stop offset="100%" stop-color="#EFB07D"/>
-      </radialGradient>
-    </defs>
-    <circle cx="60" cy="66" r="38" fill="url(#g2)"/>
-    <path d="M35 44 L48 26 L52 50 Z" fill="#EFB07D"/>
-    <path d="M85 44 L72 26 L68 50 Z" fill="#EFB07D"/>
-    <circle cx="48" cy="67" r="5" fill="#1f2937"/>
-    <circle cx="72" cy="67" r="5" fill="#1f2937"/>
-    <path d="M60 72 L55 79 L65 79 Z" fill="#F472B6"/>
-    <path d="M94 34
-             C94 27, 86 26, 84 32
-             C82 26, 74 27, 74 34
-             C74 44, 84 50, 84 50
-             C84 50, 94 44, 94 34Z"
-          fill="#EF3A7A"/>
-  </svg>`;
-}
 
 /**
  * Tiny confetti (no libraries)
@@ -180,3 +232,32 @@ function tick() {
 
   if (pieces.length) raf = requestAnimationFrame(tick);
 }
+
+noBtn.addEventListener("click", () => {
+  const s = STEPS[step];
+
+  // Final step: Yes / Yes
+  if (s.finalYes) {
+    showYay();
+    return;
+  }
+
+  // Step 0 -> Step 1 special: after moving, shake the NO (now smaller)
+  if (step === 0) {
+    nextStep(); // now step === 1 and UI is rendered
+
+    const s1 = STEPS[step];
+    const scaleMap = [1, 0.92, 0.84, 0.76];
+    const scale = scaleMap[Math.min(Math.max(s1.noLevel ?? 0, 0), 3)];
+
+    noBtn.style.setProperty("--s", String(scale));
+    noBtn.classList.remove("wiggle");
+    void noBtn.offsetWidth;
+    noBtn.classList.add("wiggle");
+
+    return;
+  }
+
+  // Default: advance a step
+  nextStep();
+});
