@@ -1,0 +1,618 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Love Meter</title>
+
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: #fff7fb;
+        font-family: "Comic Sans MS", "Trebuchet MS", system-ui, sans-serif;
+        color: #222;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .app {
+        width: min(950px, 95vw);
+        text-align: center;
+        padding: 24px;
+      }
+
+      h1 {
+        margin: 0 0 12px;
+        font-size: clamp(30px, 4vw, 48px);
+      }
+
+      .message {
+        min-height: 70px;
+        font-size: clamp(18px, 2.6vw, 26px);
+        font-weight: 900;
+        margin-bottom: 16px;
+      }
+
+      .stage {
+        position: relative;
+        height: 380px;
+        margin-bottom: 26px;
+      }
+
+      .person {
+        position: absolute;
+        bottom: 135px;
+        width: 90px;
+        height: 120px;
+        transform: translateX(-50%);
+      }
+
+      .person.left {
+        left: 10%;
+      }
+
+      .person.middle {
+        left: 50%;
+      }
+
+      .person.right {
+        left: 90%;
+      }
+
+      .head {
+        width: 58px;
+        height: 58px;
+        border: 4px solid #222;
+        border-radius: 50%;
+        margin: 0 auto;
+        background: #fff;
+        position: relative;
+      }
+
+      .person.left .head::after {
+        content: "😒";
+        position: absolute;
+        inset: 5px;
+        font-size: 28px;
+      }
+
+      .person.middle .head::after {
+        content: "🥰";
+        position: absolute;
+        inset: 5px;
+        font-size: 28px;
+      }
+
+      .person.right .head::after {
+        content: "👑";
+        position: absolute;
+        inset: 5px;
+        font-size: 28px;
+      }
+
+      .body-line {
+        width: 4px;
+        height: 42px;
+        background: #222;
+        margin: 0 auto;
+        border-radius: 999px;
+      }
+
+      .arms {
+        width: 66px;
+        height: 4px;
+        background: #222;
+        margin: -25px auto 20px;
+        border-radius: 999px;
+      }
+
+      .legs {
+        position: relative;
+        width: 48px;
+        height: 42px;
+        margin: 0 auto;
+      }
+
+      .legs::before,
+      .legs::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        width: 4px;
+        height: 42px;
+        background: #222;
+        border-radius: 999px;
+        transform-origin: top;
+      }
+
+      .legs::before {
+        left: 22px;
+        transform: rotate(25deg);
+      }
+
+      .legs::after {
+        right: 22px;
+        transform: rotate(-25deg);
+      }
+
+      .person.left.react {
+        animation: grumpyNo 0.55s ease;
+      }
+
+      .person.middle.react {
+        animation: happyWiggle 0.6s ease;
+      }
+
+      .person.right.react {
+        animation: princessBounce 0.65s ease;
+      }
+
+      @keyframes grumpyNo {
+        0% {
+          transform: translateX(-50%) rotate(0deg);
+        }
+
+        15% {
+          transform: translateX(-50%) rotate(-12deg);
+        }
+
+        30% {
+          transform: translateX(-50%) rotate(12deg);
+        }
+
+        45% {
+          transform: translateX(-50%) rotate(-10deg);
+        }
+
+        60% {
+          transform: translateX(-50%) rotate(10deg);
+        }
+
+        80% {
+          transform: translateX(-50%) rotate(-5deg);
+        }
+
+        100% {
+          transform: translateX(-50%) rotate(0deg);
+        }
+      }
+
+      @keyframes happyWiggle {
+        0% {
+          transform: translateX(-50%) rotate(0deg) scale(1);
+        }
+
+        20% {
+          transform: translateX(-50%) rotate(-5deg) scale(1.04);
+        }
+
+        40% {
+          transform: translateX(-50%) rotate(5deg) scale(1.06);
+        }
+
+        60% {
+          transform: translateX(-50%) rotate(-4deg) scale(1.04);
+        }
+
+        80% {
+          transform: translateX(-50%) rotate(4deg) scale(1.02);
+        }
+
+        100% {
+          transform: translateX(-50%) rotate(0deg) scale(1);
+        }
+      }
+
+      @keyframes princessBounce {
+        0% {
+          transform: translateX(-50%) translateY(0) rotate(0deg);
+        }
+
+        20% {
+          transform: translateX(-50%) translateY(-18px) rotate(-4deg);
+        }
+
+        40% {
+          transform: translateX(-50%) translateY(0) rotate(4deg);
+        }
+
+        60% {
+          transform: translateX(-50%) translateY(-12px) rotate(-3deg);
+        }
+
+        80% {
+          transform: translateX(-50%) translateY(0) rotate(3deg);
+        }
+
+        100% {
+          transform: translateX(-50%) translateY(0) rotate(0deg);
+        }
+      }
+
+      .meter {
+        position: absolute;
+        left: 14%;
+        right: 14%;
+        bottom: 58px;
+        height: 155px;
+      }
+
+      .you-are-here {
+        position: absolute;
+        left: 85%;
+        top: 0;
+        transform: translateX(-50%);
+        font-size: 14px;
+        font-weight: 900;
+        white-space: nowrap;
+        background: white;
+        padding: 3px 9px;
+        border: 2px solid #222;
+        border-radius: 999px;
+        box-shadow: 2px 2px 0 #222;
+        transition: left 0.4s ease;
+        z-index: 2;
+      }
+
+      .arrow {
+        position: absolute;
+        left: 85%;
+        top: 42px;
+        width: 34px;
+        height: 72px;
+        transform: translateX(-50%);
+        transition: left 0.4s ease;
+        z-index: 2;
+      }
+
+      .arrow::before {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 0;
+        width: 7px;
+        height: 46px;
+        background: #ff2f6d;
+        border: 3px solid #222;
+        border-radius: 999px;
+        transform: translateX(-50%);
+      }
+
+      .arrow::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        width: 24px;
+        height: 24px;
+        background: #ff2f6d;
+        border-right: 3px solid #222;
+        border-bottom: 3px solid #222;
+        transform: translateX(-50%) rotate(45deg);
+      }
+
+      .bar {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 25px;
+        height: 28px;
+        border: 3px solid #222;
+        border-radius: 999px;
+        overflow: hidden;
+        background: linear-gradient(
+          90deg,
+          #ff1744 0%,
+          #ff6d00 15%,
+          #ffd600 30%,
+          #00e676 48%,
+          #00b0ff 66%,
+          #651fff 84%,
+          #ff00cc 100%
+        );
+        box-shadow: 4px 4px 0 #222;
+      }
+
+      .bar::after {
+        content: "";
+        position: absolute;
+        top: 5px;
+        left: 7px;
+        right: 7px;
+        height: 7px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.5);
+      }
+
+      .bar-labels {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        justify-content: space-between;
+        font-size: 15px;
+        font-weight: 900;
+      }
+
+      .controls {
+        display: flex;
+        justify-content: center;
+        gap: 18px;
+        flex-wrap: wrap;
+      }
+
+      button {
+        padding: 14px 26px;
+        border: 3px solid #222;
+        border-radius: 12px;
+        background: #fff;
+        font: inherit;
+        font-size: 18px;
+        font-weight: 900;
+        cursor: pointer;
+        box-shadow: 4px 4px 0 #222;
+      }
+
+      button:active {
+        transform: translate(3px, 3px);
+        box-shadow: 1px 1px 0 #222;
+      }
+
+      @media (max-width: 700px) {
+        .stage {
+          height: 360px;
+        }
+
+        .meter {
+          left: 10%;
+          right: 10%;
+        }
+
+        .person {
+          transform: translateX(-50%) scale(0.78);
+        }
+
+        .person.left.react {
+          animation: grumpyNoMobile 0.55s ease;
+        }
+
+        .person.middle.react {
+          animation: happyWiggleMobile 0.6s ease;
+        }
+
+        .person.right.react {
+          animation: princessBounceMobile 0.65s ease;
+        }
+
+        .bar-labels {
+          font-size: 12px;
+        }
+
+        .you-are-here {
+          font-size: 12px;
+        }
+      }
+
+      @keyframes grumpyNoMobile {
+        0% {
+          transform: translateX(-50%) scale(0.78) rotate(0deg);
+        }
+
+        20% {
+          transform: translateX(-50%) scale(0.78) rotate(-12deg);
+        }
+
+        40% {
+          transform: translateX(-50%) scale(0.78) rotate(12deg);
+        }
+
+        60% {
+          transform: translateX(-50%) scale(0.78) rotate(-8deg);
+        }
+
+        80% {
+          transform: translateX(-50%) scale(0.78) rotate(8deg);
+        }
+
+        100% {
+          transform: translateX(-50%) scale(0.78) rotate(0deg);
+        }
+      }
+
+      @keyframes happyWiggleMobile {
+        0% {
+          transform: translateX(-50%) scale(0.78) rotate(0deg);
+        }
+
+        25% {
+          transform: translateX(-50%) scale(0.82) rotate(-5deg);
+        }
+
+        50% {
+          transform: translateX(-50%) scale(0.84) rotate(5deg);
+        }
+
+        75% {
+          transform: translateX(-50%) scale(0.82) rotate(-3deg);
+        }
+
+        100% {
+          transform: translateX(-50%) scale(0.78) rotate(0deg);
+        }
+      }
+
+      @keyframes princessBounceMobile {
+        0% {
+          transform: translateX(-50%) scale(0.78) translateY(0) rotate(0deg);
+        }
+
+        25% {
+          transform: translateX(-50%) scale(0.78) translateY(-16px)
+            rotate(-4deg);
+        }
+
+        50% {
+          transform: translateX(-50%) scale(0.78) translateY(0) rotate(4deg);
+        }
+
+        75% {
+          transform: translateX(-50%) scale(0.78) translateY(-9px) rotate(-3deg);
+        }
+
+        100% {
+          transform: translateX(-50%) scale(0.78) translateY(0) rotate(0deg);
+        }
+      }
+
+      .person {
+  position: absolute;
+  bottom: 115px;
+  width: 110px;
+  height: 110px;
+  transform: translateX(-50%);
+  transform-origin: center bottom;
+}
+
+.person {
+  width: 140px;
+  height: 140px;
+}
+
+.person img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+    </style>
+  </head>
+
+  <body>
+    <main class="app">
+      <h1>Love Meter</h1>
+
+      <div id="message" class="message"></div>
+
+      <section class="stage">
+        <div class="person left">
+  <img src="./image1.jpeg" alt="Level 1" />
+</div>
+
+<div class="person middle">
+  <img src="./image2.jpeg" alt="Level 2" />
+</div>
+
+<div class="person right">
+  <img src="./image3.jpeg" alt="Level 3" />
+</div>
+
+        <div class="meter">
+          <div id="youAreHere" class="you-are-here">you are here</div>
+          <div id="arrow" class="arrow"></div>
+
+          <div class="bar"></div>
+
+          <div class="bar-labels">
+            <span>Under-loved</span>
+            <span>Spoiled</span>
+            <span>Pampered</span>
+          </div>
+        </div>
+      </section>
+
+      <div class="controls">
+        <button id="lessBtn">Less Love</button>
+        <button id="moreBtn">More Love</button>
+      </div>
+    </main>
+
+    <script>
+      let love = 85;
+
+      const arrow = document.getElementById("arrow");
+      const message = document.getElementById("message");
+      const youAreHere = document.getElementById("youAreHere");
+      const people = document.querySelectorAll(".person");
+
+      function getMessage(value) {
+        if (value === 0) {
+          return "0/100 — Can't give less love. Even the button is embarrassed.";
+        }
+
+        if (value <= 25) {
+          return `${value}/100 — Ente muthine njan snehikille. This is illegal levels of low love.`;
+        }
+
+        if (value <= 49) {
+          return `${value}/100 — Ente muth ine kurachoodé njan snehikkatte.`;
+        }
+
+        if (value === 50) {
+          return "50/100 — Ente perfect muth alleeeeeeeeeee ❤️";
+        }
+
+        if (value <= 75) {
+          return `${value}/100 — Ichiri koodi snehikaallooo... Ente muth. Approved.`;
+        }
+
+        if (value <= 99) {
+          return `${value}/100 - Warning: excessive pampering detected. Sookshikanam. Illel Penn vashalavum`;
+        }
+
+        return "100/100 — 💜 Penn vashalaayi. No further pampering permitted.";
+      }
+
+      
+      function animatePeople() {
+        people.forEach((person) => {
+          person.classList.remove("react");
+          void person.offsetWidth;
+          person.classList.add("react");
+        });
+      }
+
+      function updateMeter() {
+        arrow.style.left = `${love}%`;
+        youAreHere.style.left = `${love}%`;
+        message.textContent = getMessage(love);
+      }
+
+      document.getElementById("lessBtn").addEventListener("click", () => {
+        animatePeople();
+
+        if (love === 0) {
+          message.textContent =
+            "Love reduction denied. I won't let my muth starve of love.";
+          return;
+        }
+
+        love = Math.max(0, love - 5);
+        updateMeter();
+      });
+
+      document.getElementById("moreBtn").addEventListener("click", () => {
+        animatePeople();
+
+        if (love === 100) {
+          message.textContent =
+            "Heart storage full. Please upgrade to Love Premium.";
+          return;
+        }
+
+        love = Math.min(100, love + 5);
+        updateMeter();
+      });
+
+      updateMeter();
+    </script>
+  </bod
+  y>
+</html>
